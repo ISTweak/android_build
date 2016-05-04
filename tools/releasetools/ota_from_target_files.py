@@ -637,15 +637,6 @@ else if get_stage("%(bcb_dev)s") == "3/3" then
   if HasVendorPartition(input_zip):
     system_progress -= 0.1
 
-  if not OPTIONS.wipe_user_data:
-    script.AppendExtra("if is_mounted(\"/data\") then")
-    script.ValidateSignatures("data")
-    script.AppendExtra("else")
-    script.Mount("/data")
-    script.ValidateSignatures("data")
-    script.Unmount("/data")
-    script.AppendExtra("endif;")
-
   if "selinux_fc" in OPTIONS.info_dict:
     WritePolicyConfig(OPTIONS.info_dict["selinux_fc"], output_zip)
 
@@ -676,17 +667,6 @@ else if get_stage("%(bcb_dev)s") == "3/3" then
   boot_img = common.GetBootableImage("boot.img", "boot.img",
                                      OPTIONS.input_tmp, "BOOT")
 
-  if not block_based:
-    def output_sink(fn, data):
-      common.ZipWriteStr(output_zip, "recovery/" + fn, data)
-      system_items.Get("system/" + fn)
-
-    common.MakeRecoveryPatch(OPTIONS.input_tmp, output_sink,
-                             recovery_img, boot_img)
-
-    system_items.GetMetadata(input_zip)
-    system_items.Get("system").SetPermissions(script)
-
   if HasVendorPartition(input_zip):
     vendor_items = ItemSet("vendor", "META/vendor_filesystem_config.txt")
     script.ShowProgress(0.1, 0)
@@ -707,9 +687,6 @@ else if get_stage("%(bcb_dev)s") == "3/3" then
       vendor_items.GetMetadata(input_zip)
       vendor_items.Get("vendor").SetPermissions(script)
 
-  common.CheckSize(boot_img.data, "boot.img", OPTIONS.info_dict)
-  common.ZipWriteStr(output_zip, "boot.img", boot_img.data)
-
   device_specific.FullOTA_PostValidate()
 
   if OPTIONS.backuptool:
@@ -719,9 +696,6 @@ else if get_stage("%(bcb_dev)s") == "3/3" then
     script.RunBackup("restore")
     if block_based:
       script.Unmount("/system")
-
-  script.ShowProgress(0.05, 5)
-  script.WriteRawImage("/boot", "boot.img")
 
   script.ShowProgress(0.2, 10)
   device_specific.FullOTA_InstallEnd()

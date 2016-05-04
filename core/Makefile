@@ -1,5 +1,5 @@
 # Put some miscellaneous rules here
-
+BLOCK_BASED_OTA := false
 # Build system colors
 
 ifneq ($(BUILD_WITH_COLORS),0)
@@ -1084,7 +1084,7 @@ $(RECOVERY_PATCH_INSTALL): $(INSTALLED_RECOVERYIMAGE_TARGET) \
 		$(TARGET_RECOVERY_ROOT_OUT),$(ota_temp_root)/RECOVERY/RAMDISK)
 	$(hide) $(call package_files-copy-root, \
 		$(TARGET_ROOT_OUT),$(ota_temp_root)/BOOT/RAMDISK)
-	$(hide) $(call package_files-copy-root, \
+		$(hide) $(call package_files-copy-root, \
 		$(TARGET_OUT)/etc,$(ota_temp_root)/SYSTEM/etc)
 	@echo "recovery_api_version=$(PRIVATE_RECOVERY_API_VERSION)" > $(ota_temp_root)/META/misc_info.txt
 	@echo "fstab_version=$(PRIVATE_RECOVERY_FSTAB_VERSION)" >> $(ota_temp_root)/META/misc_info.txt
@@ -1122,8 +1122,8 @@ endif
 	$(hide) ./build/tools/releasetools/make_recovery_patch $(ota_temp_root) $(ota_temp_root)
 	$(hide) rm -f $(TARGET_OUT)/bin/install-recovery.sh
 	$(hide) rm -f $(TARGET_OUT)/recovery-from-boot.p
-	$(hide) cp $(ota_temp_root)/SYSTEM/bin/install-recovery.sh $(TARGET_OUT)/bin/install-recovery.sh
-	$(hide) cp $(ota_temp_root)/SYSTEM/recovery-from-boot.p $(TARGET_OUT)/recovery-from-boot.p
+#	$(hide) cp $(ota_temp_root)/SYSTEM/bin/install-recovery.sh $(TARGET_OUT)/bin/install-recovery.sh
+#	$(hide) cp $(ota_temp_root)/SYSTEM/recovery-from-boot.p $(TARGET_OUT)/recovery-from-boot.p
 
 $(RECOVERY_RESOURCE_ZIP): $(INSTALLED_RECOVERYIMAGE_TARGET)
 	$(hide) mkdir -p $(dir $@)
